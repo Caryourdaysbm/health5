@@ -4,9 +4,9 @@ created Health5 that actually puts privacy first.
 
 🚀 ** Our mission**
 
- [a Web5 Health App ](https://Health5.vercel.app/), that allows user to be in control of their health information.
+ [a Web5 Health App ](https://health5.vercel.app/), that allows user to be in control of their health information.
 
-🛠️ **Your toolkit**
+🛠️ **our toolkit**
 
 Technologies used:
 
