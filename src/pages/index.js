@@ -16,7 +16,9 @@ export default function Home() {
 
   useEffect(() => {
     const initWeb5 = async () => {
-      console.log(`this log is in initWeb5`);
+      const { web5, did } = await Web5.connect({sync: '5s'});
+setWeb5(web5);
+setMyDid(did);
       if (web5 && did) {
         await configureProtocol(web5, did);
       }
@@ -26,37 +28,163 @@ export default function Home() {
 
 
   const queryLocalProtocol = async (web5) => {
-    console.log('this is in query local protocol')
-  };
+    return await web5.dwn.protocols.query({
+      message: {
+        filter: {
+          protocol: "https://sbm.hashnode.dev/health5app",
+        },
+      },
+    });  };
 
 
   const queryRemoteProtocol = async (web5, did) => {
-    console.log('this is where Query remote protocol is')
+    return await web5.dwn.protocols.query({
+      from: did,
+      message: {
+        filter: {
+          protocol: "https://sbm.hashnode.dev/health5app",
+        },
+      },
+    });
   };
 
   const installLocalProtocol = async (web5, protocolDefinition) => {
-  console.log('this is where we install local protocol')
+    return await web5.dwn.protocols.configure({
+      message: {
+        definition: protocolDefinition,
+      },
+    });
   };
 
   const installRemoteProtocol = async (web5, did, protocolDefinition) => {
-  console.log('this is where we install remote protocol')
+    const { protocol } = await web5.dwn.protocols.configure({
+      message: {
+        definition: protocolDefinition,
+      },
+    });
+    return await protocol.send(did);
   };
 
   const defineNewProtocol = () => {
-    console.log('this is where we define our protocol')
+    return {
+      protocol: "https://sbm.hashnode.dev/health5app",
+      published: true,
+      types: {
+        secretMessage: {
+          schema: "https://example.com/health5schema",
+          dataFormats: ["application/json"],
+        },
+        directMessage: {
+          schema: "https://example.com/directMessageSchema",
+          dataFormats: ["application/json"],
+        },
+      },
+      structure: {
+        secretMessage: {
+          $actions: [
+            { who: "anyone", can: "write" },
+            { who: "author", of: "secretMessage", can: "read" },
+          ],
+        },
+        directMessage: {
+          $actions: [
+            { who: "author", of: "directMessage", can: "read" },
+            { who: "recipient", of: "directMessage", can: "read" },
+            { who: "anyone", can: "write" },
+          ],
+        },
+      },
+    };
   };
 
 
   const configureProtocol = async (web5, did) => {
-   console.log('this is where we configure our protocol')
+    const protocolDefinition = defineNewProtocol();
+    const protocolUrl = protocolDefinition.protocol;
+
+    const { protocols: localProtocols, status: localProtocolStatus } = await queryLocalProtocol(web5, protocolUrl);
+    if (localProtocolStatus.code !== 200 || localProtocols.length === 0) {
+      const result = await installLocalProtocol(web5, protocolDefinition);
+      console.log({ result })
+      console.log("Protocol installed locally");
+    }
+
+    const { protocols: remoteProtocols, status: remoteProtocolStatus } = await queryRemoteProtocol(web5, did, protocolUrl);
+    if (remoteProtocolStatus.code !== 200 || remoteProtocols.length === 0) {
+      const result = await installRemoteProtocol(web5, did, protocolDefinition);
+      console.log({ result })
+      console.log("Protocol installed remotely");
+    }
   };
 
 
   const writeToDwnSecretMessage = async (messageObj) => {
-   console.log('this is where we Write the secret message')
+    try {
+      const secretMessageProtocol = defineNewProtocol();
+      const { record, status } = await web5.dwn.records.write({
+        data: messageObj,
+        message: {
+          protocol: secretMessageProtocol.protocol,
+          protocolPath: "secretMessage",
+          schema: secretMessageProtocol.types.secretMessage.schema,
+          recipient: myDid,
+        },
+      });
+
+      if (status.code === 200) {
+        return { ...messageObj, recordId: record.id };
+      }
+
+      console.log('Secret message written to DWN', { record, status });
+      return record;
+    } catch (error) {
+      console.error('Error writing secret message to DWN', error);
+    }
   };
   const writeToDwnDirectMessage = async (messageObj) => {
-    console.log('this is where we Write the direct message')
+    try {
+      const directMessageProtocol = defineNewProtocol();
+      const { record, status } = await web5.dwn.records.write({
+        data: messageObj,
+        message: {
+          protocol: directMessageProtocol.protocol,
+          protocolPath: "directMessage",
+          schema: directMessageProtocol.types.directMessage.schema,
+          recipient: messageObj.recipientDid,
+        },
+      });
+
+      if (status.code === 200) {
+        return { ...messageObj, recordId: record.id };
+      }
+
+
+      console.log('Direct message written to DWN', { record, status });
+      return record;
+    } catch (error) {
+      console.error('Error writing direct message to DWN', error);
+    }try {
+      const directMessageProtocol = defineNewProtocol();
+      const { record, status } = await web5.dwn.records.write({
+        data: messageObj,
+        message: {
+          protocol: directMessageProtocol.protocol,
+          protocolPath: "directMessage",
+          schema: directMessageProtocol.types.directMessage.schema,
+          recipient: messageObj.recipientDid,
+        },
+      });
+
+      if (status.code === 200) {
+        return { ...messageObj, recordId: record.id };
+      }
+
+
+      console.log('Direct message written to DWN', { record, status });
+      return record;
+    } catch (error) {
+      console.error('Error writing direct message to DWN', error);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -129,7 +257,7 @@ export default function Home() {
         from: myDid,
         message: {
           filter: {
-            protocol: "https://blackgirlbytes.dev/burn-book-finale",
+            protocol: "https://sbm.hasnode.dev/health5app",
             schema: "https://example.com/directMessageSchema",
           },
         },
@@ -162,7 +290,7 @@ export default function Home() {
       const response = await web5.dwn.records.query({
         message: {
           filter: {
-            protocol: "https://blackgirlbytes.dev/burn-book-finale",
+            protocol: "https://sbm.hasnode.dev/health5app",
           },
         },
       });
