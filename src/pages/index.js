@@ -367,7 +367,7 @@ setMyDid(did);
 
 
   return (
-    <div>
+    <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.avatar}>H5</div>
         <h1 className={styles.title}>Digital Health File</h1>
@@ -391,9 +391,10 @@ setMyDid(did);
             className={styles.select}
             value={messageType}
             onChange={(e) => setMessageType(e.target.value)}
+            style={{fontFamily: "IBM Plex Mono"}} 
           >
-            <option value="Secret">Keep Secret</option>
-            <option value="Direct">Send Direct</option>
+            <option value="Secret" style={{fontFamily: "IBM Plex Mono"}} >Keep Secret</option>
+            <option value="Direct" style={{fontFamily: "IBM Plex Mono"}} >Send Direct</option>
           </select>
           {messageType === 'Direct' && (
             <input

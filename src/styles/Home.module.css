@@ -1,14 +1,12 @@
 /* BurnBook.module.css */
 
 .container {
-  background-color: #fff;
-  border: 1px solid #e1e1e8;
-  border-radius: 8px;
+  background-color: #000;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 16px auto;
   padding: 24px;
-  max-width: 768px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+  /* font-family: "IBM Plex Mono" monospace; */
+  height: 100vh;
 }
 
 .formContainer {
@@ -16,7 +14,7 @@
   border: 1px solid #e1e1e8;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 32px auto;
+  margin: auto;
   padding: 24px;
   max-width: 768px;
 }
@@ -28,8 +26,9 @@
   padding: 12px;
   border-radius: 4px;
   border: 1px solid #e1e1e8;
+  background: #FFEC19;
   margin-bottom: 16px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: "IBM Plex Mono" monospace;
   font-size: 15px;
   box-sizing: border-box;
 }
@@ -37,6 +36,7 @@
 .textarea {
   height: 120px;
   resize: vertical;
+  font-family: "IBM Plex Mono" monospace;
 }
 
 .button {
@@ -63,20 +63,20 @@
 .avatar {
   width: 64px;
   height: 64px;
-  background-color: #e1e1e8;
+  background-color: #FFEC19;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 24px;
-  color: #fff;
+  color: #000;
+  font-weight: 700;
   margin-right: 16px;
 }
 
 .title {
   font-size: 24px;
-  font-weight: 500;
-  color: #333;
+  color: #FFEC19;
 }
 
 .field {
@@ -124,6 +124,7 @@
   display: flex;
   justify-content: space-between; /* This will space out the buttons */
   margin-top: 16px; /* Add some space above the button container */
+  gap: 5px;
 }
 
 .primaryButton {
@@ -135,6 +136,7 @@
   cursor: pointer;
   font-size: 15px;
   transition: background-color 0.3s;
+  font-family: "IBM Plex Mono" monospace;
 }
 
 .primaryButton:hover {
@@ -150,6 +152,7 @@
   cursor: pointer;
   font-size: 15px;
   transition: background-color 0.3s;
+  font-family: "IBM Plex Mono" monospace;
 }
 
 .secondaryButton:hover {

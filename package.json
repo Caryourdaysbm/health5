@@ -16,5 +16,11 @@
     "react": "^18",
     "react-dom": "^18",
     "stream-browserify": "^3.0.0"
-  }
+  },
+  "description": "created Health5 that actually puts privacy first.",
+  "main": "next.config.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
