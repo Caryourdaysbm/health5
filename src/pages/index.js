@@ -1,31 +1,41 @@
 import { Web5 } from "@web5/api";
 import { useState, useEffect } from "react";
-import styles from '../styles/Home.module.css'
+import styles from "../styles/Home.module.css";
+import PrivatePage from "@/components/uploadForm";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectGroup,
+//   SelectItem,
+//   SelectLabel,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/toggleButton";
 
 export default function Home() {
   const [web5, setWeb5] = useState(null);
   const [myDid, setMyDid] = useState(null);
-  const [recipientDid, setRecipientDid] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [message, setMessage] = useState('');
+  const [recipientDid, setRecipientDid] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [messageType, setMessageType] = useState('Secret');
-  const [submitStatus, setSubmitStatus] = useState('');
+  const [messageType, setMessageType] = useState("Secret");
+  const [submitStatus, setSubmitStatus] = useState("");
   const [didCopied, setDidCopied] = useState(false);
-
 
   useEffect(() => {
     const initWeb5 = async () => {
-      const { web5, did } = await Web5.connect({sync: '5s'});
-setWeb5(web5);
-setMyDid(did);
+      const { web5, did } = await Web5.connect({ sync: "5s" });
+      setWeb5(web5);
+      setMyDid(did);
       if (web5 && did) {
         await configureProtocol(web5, did);
       }
     };
     initWeb5();
   }, []);
-
 
   const queryLocalProtocol = async (web5) => {
     return await web5.dwn.protocols.query({
@@ -34,8 +44,8 @@ setMyDid(did);
           protocol: "https://sbm.hashnode.dev/health5app",
         },
       },
-    });  };
-
+    });
+  };
 
   const queryRemoteProtocol = async (web5, did) => {
     return await web5.dwn.protocols.query({
@@ -97,26 +107,26 @@ setMyDid(did);
     };
   };
 
-
   const configureProtocol = async (web5, did) => {
     const protocolDefinition = defineNewProtocol();
     const protocolUrl = protocolDefinition.protocol;
 
-    const { protocols: localProtocols, status: localProtocolStatus } = await queryLocalProtocol(web5, protocolUrl);
+    const { protocols: localProtocols, status: localProtocolStatus } =
+      await queryLocalProtocol(web5, protocolUrl);
     if (localProtocolStatus.code !== 200 || localProtocols.length === 0) {
       const result = await installLocalProtocol(web5, protocolDefinition);
-      console.log({ result })
+      console.log({ result });
       console.log("Protocol installed locally");
     }
 
-    const { protocols: remoteProtocols, status: remoteProtocolStatus } = await queryRemoteProtocol(web5, did, protocolUrl);
+    const { protocols: remoteProtocols, status: remoteProtocolStatus } =
+      await queryRemoteProtocol(web5, did, protocolUrl);
     if (remoteProtocolStatus.code !== 200 || remoteProtocols.length === 0) {
       const result = await installRemoteProtocol(web5, did, protocolDefinition);
-      console.log({ result })
+      console.log({ result });
       console.log("Protocol installed remotely");
     }
   };
-
 
   const writeToDwnSecretMessage = async (messageObj) => {
     try {
@@ -135,10 +145,10 @@ setMyDid(did);
         return { ...messageObj, recordId: record.id };
       }
 
-      console.log('Secret message written to DWN', { record, status });
+      console.log("Secret message written to DWN", { record, status });
       return record;
     } catch (error) {
-      console.error('Error writing secret message to DWN', error);
+      console.error("Error writing secret message to DWN", error);
     }
   };
   const writeToDwnDirectMessage = async (messageObj) => {
@@ -158,12 +168,12 @@ setMyDid(did);
         return { ...messageObj, recordId: record.id };
       }
 
-
-      console.log('Direct message written to DWN', { record, status });
+      console.log("Direct message written to DWN", { record, status });
       return record;
     } catch (error) {
-      console.error('Error writing direct message to DWN', error);
-    }try {
+      console.error("Error writing direct message to DWN", error);
+    }
+    try {
       const directMessageProtocol = defineNewProtocol();
       const { record, status } = await web5.dwn.records.write({
         data: messageObj,
@@ -179,47 +189,46 @@ setMyDid(did);
         return { ...messageObj, recordId: record.id };
       }
 
-
-      console.log('Direct message written to DWN', { record, status });
+      console.log("Direct message written to DWN", { record, status });
       return record;
     } catch (error) {
-      console.error('Error writing direct message to DWN', error);
+      console.error("Error writing direct message to DWN", error);
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('Submitting message...');
-    setSubmitStatus('Submitting...');
+    console.log("Submitting message...");
+    setSubmitStatus("Submitting...");
 
     try {
-      const targetDid = messageType === 'Direct' ? recipientDid : myDid;
+      const targetDid = messageType === "Direct" ? recipientDid : myDid;
       let messageObj;
       let record;
 
-      if (messageType === 'Direct') {
-        console.log('Sending direct message...');
-        messageObj = constructDirectMessage(recipientDid); 
-        record = await writeToDwnDirectMessage(messageObj); 
+      if (messageType === "Direct") {
+        console.log("Sending direct message...");
+        messageObj = constructDirectMessage(recipientDid);
+        record = await writeToDwnDirectMessage(messageObj);
       } else {
-        messageObj = constructSecretMessage(); 
+        messageObj = constructSecretMessage();
         record = await writeToDwnSecretMessage(messageObj);
       }
 
       if (record) {
         const { status } = await record.send(targetDid);
         console.log("Send record status in handleSubmit", status);
-        setSubmitStatus('Message submitted successfully');
+        setSubmitStatus("Message submitted successfully");
         await fetchMessages();
       } else {
-        throw new Error('Failed to create record');
+        throw new Error("Failed to create record");
       }
 
-      setMessage('');
-      setImageUrl('');
+      setMessage("");
+      setImageUrl("");
     } catch (error) {
-      console.error('Error in handleSubmit', error);
-      setSubmitStatus('Error submitting message: ' + error.message);
+      console.error("Error in handleSubmit", error);
+      setSubmitStatus("Error submitting message: " + error.message);
     }
   };
 
@@ -228,12 +237,12 @@ setMyDid(did);
     const currentTime = new Date().toLocaleTimeString();
 
     return {
-      text: message, 
+      text: message,
       timestamp: `${currentDate} ${currentTime}`,
-      sender: myDid, 
-      type: 'Direct', 
+      sender: myDid,
+      type: "Direct",
       recipientDid: recipientDid,
-      imageUrl: imageUrl, 
+      imageUrl: imageUrl,
     };
   };
 
@@ -242,16 +251,16 @@ setMyDid(did);
     const currentTime = new Date().toLocaleTimeString();
 
     return {
-      text: message, 
+      text: message,
       timestamp: `${currentDate} ${currentTime}`,
-      sender: myDid, 
-      type: 'Secret',
-      imageUrl: imageUrl, 
+      sender: myDid,
+      type: "Secret",
+      imageUrl: imageUrl,
     };
   };
 
   const fetchUserMessages = async () => {
-    console.log('Fetching sent messages...');
+    console.log("Fetching sent messages...");
     try {
       const response = await web5.dwn.records.query({
         from: myDid,
@@ -268,24 +277,23 @@ setMyDid(did);
           response.records.map(async (record) => {
             const data = await record.data.json();
             return {
-              ...data, 
-              recordId: record.id 
+              ...data,
+              recordId: record.id,
             };
           })
         );
-        return userMessages
+        return userMessages;
       } else {
-        console.error('Error fetching sent messages:', response.status);
+        console.error("Error fetching sent messages:", response.status);
         return [];
       }
-
     } catch (error) {
-      console.error('Error in fetchSentMessages:', error);
+      console.error("Error in fetchSentMessages:", error);
     }
   };
 
   const fetchDirectMessages = async () => {
-    console.log('Fetching received direct messages...');
+    console.log("Fetching received direct messages...");
     try {
       const response = await web5.dwn.records.query({
         message: {
@@ -300,18 +308,18 @@ setMyDid(did);
           response.records.map(async (record) => {
             const data = await record.data.json();
             return {
-              ...data, 
-              recordId: record.id 
+              ...data,
+              recordId: record.id,
             };
           })
         );
-        return directMessages
+        return directMessages;
       } else {
-        console.error('Error fetching sent messages:', response.status);
+        console.error("Error fetching sent messages:", response.status);
         return [];
       }
     } catch (error) {
-      console.error('Error in fetchReceivedDirectMessages:', error);
+      console.error("Error in fetchReceivedDirectMessages:", error);
     }
   };
 
@@ -321,7 +329,6 @@ setMyDid(did);
     const allMessages = [...(userMessages || []), ...(directMessages || [])];
     setMessages(allMessages);
   };
-
 
   const handleCopyDid = async () => {
     if (myDid) {
@@ -352,105 +359,147 @@ setMyDid(did);
         const deleteResult = await record.delete();
 
         if (deleteResult.status.code === 202) {
-          console.log('Message deleted successfully');
-          setMessages(prevMessages => prevMessages.filter(message => message.recordId !== recordId));
+          console.log("Message deleted successfully");
+          setMessages((prevMessages) =>
+            prevMessages.filter((message) => message.recordId !== recordId)
+          );
         } else {
-          console.error('Error deleting message:', deleteResult.status);
+          console.error("Error deleting message:", deleteResult.status);
         }
       } else {
-        console.error('No record found with the specified ID');
+        console.error("No record found with the specified ID");
       }
     } catch (error) {
-      console.error('Error in deleteMessage:', error);
+      console.error("Error in deleteMessage:", error);
     }
   };
 
-
   return (
-    <div>
-      <div className={styles.header}>
-        <div className={styles.avatar}>H5</div>
-        <h1 className={styles.title}>Digital Health File</h1>
-      </div>
-      <div className={styles.formContainer}>
-        <form onSubmit={handleSubmit}>
-          <textarea
-            className={styles.textarea}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write health information/diagnosis here"
-          />
-          <input
-            className={styles.input}
-            type="text"
-            placeholder="Enter image URL (optional)"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
-          <select
-            className={styles.select}
-            value={messageType}
-            onChange={(e) => setMessageType(e.target.value)}
-          >
-            <option value="Secret">Keep Secret</option>
-            <option value="Direct">Send Direct</option>
-          </select>
-          {messageType === 'Direct' && (
-            <input
-              className={styles.input}
-              type="text"
-              value={recipientDid}
-              onChange={e => setRecipientDid(e.target.value)}
-              placeholder="Enter recipient's DID"
-            />
-          )}
-          <div className={styles.buttonContainer}>
-            <button className={styles.button} type="submit">Submit Info/diagnosis</button>
-            <button className={styles.secondaryButton} type="button" onClick={fetchMessages}>Refresh Info</button>
-            <button className={styles.secondaryButton} type="button" onClick={handleCopyDid}>Copy DID</button>
-          </div>
-        </form>
-        {didCopied && <p className={styles.alertText}>DID copied to clipboard!</p>}
-      </div>
-      {messages.map((message, index) => (
-        <div key={index} className={styles.container}>
-          <div className={styles.field}>
-            <div className={styles.fieldName}>From:</div>
-            <div className={styles.didContainer}>{message.sender}</div>
-          </div>
-          <div className={styles.field}>
-            <div className={styles.fieldName}>Timestamp</div>
-            <div>{message.timestamp}</div>
-          </div>
-          <div className={styles.messageRow}>
-            <div className={styles.messageContent}>
-              <div className={styles.fieldName}>Message</div>
-              <div>{message.text}</div>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div className="bg-background text-primary-background">
+        <div className={styles.navContainer}>
+          <div className={styles.navBar}>
+            <div className="flex items-center">
+              <div className={styles.avatar}>H5</div>
+              <h1 className={styles.title}>Digital Health File</h1>
             </div>
-            {message.sender === myDid && (
-              <button
-                className={styles.deleteButton}
-                onClick={() => deleteMessage(message.recordId)}
-              >
-                Delete
-              </button>
-            )}
-          </div>
-          {message.imageUrl && (
-            <div className={styles.imageContainer}>
-              <img
-                className={styles.image}
-                src={message.imageUrl}
-                alt="Uploaded content"
-              />
+
+            <div>
+              <ModeToggle />
             </div>
-          )}
-          <div className={`${styles.messageType} ${styles[message.type.toLowerCase()]}`}>
-            {message.type}
           </div>
         </div>
-      ))}
 
-    </div>
+        <div className={styles.formContainer}>
+          <form onSubmit={handleSubmit}>
+            <textarea
+              className={styles.textarea}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Write health information/diagnosis here"
+            />
+            <div className={styles.imageContainer2}>
+              <PrivatePage />
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Enter image URL (optional)"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+            </div>
+
+            <select
+              className={styles.select}
+              value={messageType}
+              onChange={(e) => setMessageType(e.target.value)}
+            >
+              <option value="Secret">Keep Secret</option>
+              <option value="Direct">Send Direct</option>
+            </select>
+            {messageType === "Direct" && (
+              <input
+                className={styles.input}
+                type="text"
+                value={recipientDid}
+                onChange={(e) => setRecipientDid(e.target.value)}
+                placeholder="Enter recipient's DID"
+              />
+            )}
+            <div className={styles.buttonContainer}>
+              <button className={styles.button} type="submit">
+                Submit Info/diagnosis
+              </button>
+              <div className={styles.buttonContainer2}>
+                <button
+                  className={styles.secondaryButton}
+                  type="button"
+                  onClick={fetchMessages}
+                >
+                  Refresh Info
+                </button>
+                <button
+                  className={styles.secondaryButton}
+                  type="button"
+                  onClick={handleCopyDid}
+                >
+                  Copy DID
+                </button>
+              </div>
+            </div>
+          </form>
+          {didCopied && (
+            <p className={styles.alertText}>DID copied to clipboard!</p>
+          )}
+        </div>
+        {messages.map((message, index) => (
+          <div key={index} className={styles.container}>
+            <div className={styles.field}>
+              <div className={styles.fieldName}>From:</div>
+              <div className={styles.didContainer}>{message.sender}</div>
+            </div>
+            <div className={styles.field}>
+              <div className={styles.fieldName}>Timestamp</div>
+              <div>{message.timestamp}</div>
+            </div>
+            <div className={styles.messageRow}>
+              <div className={styles.messageContent}>
+                <div className={styles.fieldName}>Message</div>
+                <div>{message.text}</div>
+              </div>
+              {message.sender === myDid && (
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => deleteMessage(message.recordId)}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+            {message.imageUrl && (
+              <div className={styles.imageContainer}>
+                <img
+                  className={styles.image}
+                  src={message.imageUrl}
+                  alt="Uploaded content"
+                />
+              </div>
+            )}
+            <div
+              className={`${styles.messageType} ${
+                styles[message.type.toLowerCase()]
+              }`}
+            >
+              {message.type}
+            </div>
+          </div>
+        ))}
+      </div>
+    </ThemeProvider>
   );
 }
