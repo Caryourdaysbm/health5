@@ -231,7 +231,7 @@ setMyDid(did);
 
         if (response.status.code === 200 && response.records) {
             const userMessages = await Promise.all(
-              console.log(response.records)
+              console.log(response.records);
                 response.records.map(async (record) => {
                     const data = await record.data.json();
                     return {
