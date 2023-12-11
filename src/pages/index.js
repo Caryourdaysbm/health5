@@ -187,41 +187,7 @@ setMyDid(did);
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log('Submitting message...');
-    setSubmitStatus('Submitting...');
-
-    try {
-      const targetDid = messageType === 'Direct' ? recipientDid : myDid;
-      let messageObj;
-      let record;
-
-      if (messageType === 'Direct') {
-        console.log('Sending direct message...');
-        messageObj = constructDirectMessage(recipientDid); 
-        record = await writeToDwnDirectMessage(messageObj); 
-      } else {
-        messageObj = constructSecretMessage(); 
-        record = await writeToDwnSecretMessage(messageObj);
-      }
-
-      if (record) {
-        const { status } = await record.send(targetDid);
-        console.log("Send record status in handleSubmit", status);
-        setSubmitStatus('Message submitted successfully');
-        await fetchMessages();
-      } else {
-        throw new Error('Failed to create record');
-      }
-
-      setMessage('');
-      setImageUrl('');
-    } catch (error) {
-      console.error('Error in handleSubmit', error);
-      setSubmitStatus('Error submitting message: ' + error.message);
-    }
-  };
+ 
 
   const constructDirectMessage = (recipientDid) => {
     const currentDate = new Date().toLocaleDateString();
@@ -322,6 +288,41 @@ setMyDid(did);
     setMessages(allMessages);
   };
 
+   const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log('Submitting message...');
+    setSubmitStatus('Submitting...');
+
+    try {
+      const targetDid = messageType === 'Direct' ? recipientDid : myDid;
+      let messageObj;
+      let record;
+
+      if (messageType === 'Direct') {
+        console.log('Sending direct message...');
+        messageObj = constructDirectMessage(recipientDid); 
+        record = await writeToDwnDirectMessage(messageObj); 
+      } else {
+        messageObj = constructSecretMessage(); 
+        record = await writeToDwnSecretMessage(messageObj);
+      }
+
+      if (record) {
+        const { status } = await record.send(targetDid);
+        console.log("Send record status in handleSubmit", status);
+        setSubmitStatus('Message submitted successfully');
+        await fetchMessages();
+      } else {
+        throw new Error('Failed to create record');
+      }
+
+      setMessage('');
+      setImageUrl('');
+    } catch (error) {
+      console.error('Error in handleSubmit', error);
+      setSubmitStatus('Error submitting message: ' + error.message);
+    }
+  };
 
   const handleCopyDid = async () => {
     if (myDid) {
