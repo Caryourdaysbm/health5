@@ -16,7 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     const initWeb5 = async () => {
-      const { web5, did } = await Web5.connect({sync: '5s'});
+      const { web5, did } = await Web5.connect({sync: '1s'});
 setWeb5(web5);
 setMyDid(did);
       if (web5 && did) {
@@ -223,7 +223,7 @@ setMyDid(did);
         from: myDid,
         message: {
           filter: {
-            protocol: "https://sbm.hasnode.dev/health5app",
+            protocol: "https://sbm.hashnode.dev/health5app",
             schema: "https://example.com/directMessageSchema",
           },
         },
