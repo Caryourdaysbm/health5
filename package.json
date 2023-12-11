@@ -25,6 +25,7 @@
     "process": "^0.11.10",
     "react": "^18",
     "react-dom": "^18",
+ 
     "stream-browserify": "^3.0.0",
     "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.7"
@@ -37,4 +38,14 @@
     "tailwindcss": "^3.3.6",
     "typescript": "5.3.2"
   }
+ 
+    
+  },
+  "description": "created Health5 that actually puts privacy first.",
+  "main": "next.config.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+ 
 }

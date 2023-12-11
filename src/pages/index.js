@@ -81,7 +81,7 @@ export default function Home() {
       published: true,
       types: {
         secretMessage: {
-          schema: "https://example.com/health5schema",
+          schema: "https://example.com/secretMessageSchema",
           dataFormats: ["application/json"],
         },
         directMessage: {
@@ -375,13 +375,14 @@ export default function Home() {
   };
 
   return (
+ 
     <ThemeProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
     >
-      <div className="bg-background text-primary-background">
+    <div className="bg-background text-primary-background">
         <div className={styles.navContainer}>
           <div className={styles.navBar}>
             <div className="flex items-center">
@@ -391,6 +392,65 @@ export default function Home() {
 
             <div>
               <ModeToggle />
+            </div>
+          </div>
+        </div>
+      <div className={styles.formContainer}>
+        <form onSubmit={handleSubmit}>
+          <textarea
+            className={styles.textarea}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Write health information/diagnosis here"
+          />
+          <input
+            className={styles.input}
+            type="text"
+            placeholder="Enter image URL (optional)"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />
+          <select
+            className={styles.select}
+            value={messageType}
+            onChange={(e) => setMessageType(e.target.value)}
+            style={{fontFamily: "IBM Plex Mono"}} 
+          >
+            <option value="Secret" style={{fontFamily: "IBM Plex Mono"}} >Keep Secret</option>
+            <option value="Direct" style={{fontFamily: "IBM Plex Mono"}} >Send Direct</option>
+          </select>
+          {messageType === 'Direct' && (
+            <input
+              className={styles.input}
+              type="text"
+              value={recipientDid}
+              onChange={e => setRecipientDid(e.target.value)}
+              placeholder="Enter recipient's DID"
+            />
+          )}
+          <div className={styles.buttonContainer}>
+            <button className={styles.button} type="submit">Submit Info/diagnosis</button>
+            <button className={styles.secondaryButton} type="button" onClick={fetchMessages}>Refresh Info</button>
+            <button className={styles.secondaryButton} type="button" onClick={handleCopyDid}>Copy DID</button>
+          </div>
+        </form>
+        {didCopied && <p className={styles.alertText}>DID copied to clipboard!</p>}
+      </div>
+      {messages.map((message, index) => (
+        <div key={index} className={styles.container}>
+          <div className={styles.field}>
+            <div className={styles.fieldName}>From:</div>
+            <div className={styles.didContainer}>{message.sender}</div>
+          </div>
+          <div className={styles.field}>
+            <div className={styles.fieldName}>Timestamp</div>
+            <div>{message.timestamp}</div>
+          </div>
+          <div className={styles.messageRow}>
+            <div className={styles.messageContent}>
+              <div className={styles.fieldName}>Message</div>
+              <div>{message.text}</div>
+>>>>>>> main
             </div>
           </div>
         </div>
