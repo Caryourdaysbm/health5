@@ -27,9 +27,11 @@ export default function Home() {
 
   useEffect(() => {
     const initWeb5 = async () => {
+ 
       const { web5, did } = await Web5.connect({ sync: "5s" });
       setWeb5(web5);
       setMyDid(did);
+ 
       if (web5 && did) {
         await configureProtocol(web5, did);
       }
@@ -196,41 +198,7 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log("Submitting message...");
-    setSubmitStatus("Submitting...");
-
-    try {
-      const targetDid = messageType === "Direct" ? recipientDid : myDid;
-      let messageObj;
-      let record;
-
-      if (messageType === "Direct") {
-        console.log("Sending direct message...");
-        messageObj = constructDirectMessage(recipientDid);
-        record = await writeToDwnDirectMessage(messageObj);
-      } else {
-        messageObj = constructSecretMessage();
-        record = await writeToDwnSecretMessage(messageObj);
-      }
-
-      if (record) {
-        const { status } = await record.send(targetDid);
-        console.log("Send record status in handleSubmit", status);
-        setSubmitStatus("Message submitted successfully");
-        await fetchMessages();
-      } else {
-        throw new Error("Failed to create record");
-      }
-
-      setMessage("");
-      setImageUrl("");
-    } catch (error) {
-      console.error("Error in handleSubmit", error);
-      setSubmitStatus("Error submitting message: " + error.message);
-    }
-  };
+ 
 
   const constructDirectMessage = (recipientDid) => {
     const currentDate = new Date().toLocaleDateString();
@@ -262,6 +230,7 @@ export default function Home() {
   const fetchUserMessages = async () => {
     console.log("Fetching sent messages...");
     try {
+ 
       const response = await web5.dwn.records.query({
         from: myDid,
         message: {
@@ -289,8 +258,39 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error in fetchSentMessages:", error);
+ 
+        const response = await web5.dwn.records.query({
+            from: myDid,
+            message: {
+                filter: {
+                    protocol: "https://sbm.hashnode.dev/health5app",
+                    schema: "https://example.com/directMessageSchema",
+                },
+            },
+        });
+
+        if (response.status.code === 200 && response.records) {
+            const userMessages = await Promise.all(
+              console.log(response.records)
+                response.records.map(async (record) => {
+                    const data = await record.data.json();
+                    return {
+                        ...data,
+                        recordId: record.id,
+                    };
+                })
+            );
+            return userMessages;
+        } else {
+            console.error('Error fetching sent messages:', response.status);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error in fetchSentMessages:', error);
+ 
     }
-  };
+};
+
 
   const fetchDirectMessages = async () => {
     console.log("Fetching received direct messages...");
@@ -330,6 +330,44 @@ export default function Home() {
     setMessages(allMessages);
   };
 
+ 
+   const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log('Submitting message...');
+    setSubmitStatus('Submitting...');
+
+    try {
+      const targetDid = messageType === 'Direct' ? recipientDid : myDid;
+      let messageObj;
+      let record;
+
+      if (messageType === 'Direct') {
+        console.log('Sending direct message...');
+        messageObj = constructDirectMessage(recipientDid); 
+        record = await writeToDwnDirectMessage(messageObj); 
+      } else {
+        messageObj = constructSecretMessage(); 
+        record = await writeToDwnSecretMessage(messageObj);
+      }
+
+      if (record) {
+        const { status } = await record.send(targetDid);
+        console.log("Send record status in handleSubmit", status);
+        setSubmitStatus('Message submitted successfully');
+        await fetchMessages();
+      } else {
+        throw new Error('Failed to create record');
+      }
+
+      setMessage('');
+      setImageUrl('');
+    } catch (error) {
+      console.error('Error in handleSubmit', error);
+      setSubmitStatus('Error submitting message: ' + error.message);
+    }
+  };
+
+ 
   const handleCopyDid = async () => {
     if (myDid) {
       try {
@@ -450,7 +488,7 @@ export default function Home() {
             <div className={styles.messageContent}>
               <div className={styles.fieldName}>Message</div>
               <div>{message.text}</div>
->>>>>>> main
+ 
             </div>
           </div>
         </div>
