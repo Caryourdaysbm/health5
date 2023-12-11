@@ -219,36 +219,37 @@ setMyDid(did);
   const fetchUserMessages = async () => {
     console.log('Fetching sent messages...');
     try {
-      const response = await web5.dwn.records.query({
-        from: myDid,
-        message: {
-          filter: {
-            protocol: "https://sbm.hashnode.dev/health5app",
-            schema: "https://example.com/directMessageSchema",
-          },
-        },
-      });
+        const response = await web5.dwn.records.query({
+            from: myDid,
+            message: {
+                filter: {
+                    protocol: "https://sbm.hashnode.dev/health5app",
+                    schema: "https://example.com/directMessageSchema",
+                },
+            },
+        });
 
-      if (response.status.code === 200) {
-        const userMessages = await Promise.all(
-          response.records.map(async (record) => {
-            const data = await record.data.json();
-            return {
-              ...data, 
-              recordId: record.id 
-            };
-          })
-        );
-        return userMessages
-      } else {
-        console.error('Error fetching sent messages:', response.status);
-        return [];
-      }
-
+        if (response.status.code === 200 && response.records) {
+            const userMessages = await Promise.all(
+              console.log(response.records)
+                response.records.map(async (record) => {
+                    const data = await record.data.json();
+                    return {
+                        ...data,
+                        recordId: record.id,
+                    };
+                })
+            );
+            return userMessages;
+        } else {
+            console.error('Error fetching sent messages:', response.status);
+            return [];
+        }
     } catch (error) {
-      console.error('Error in fetchSentMessages:', error);
+        console.error('Error in fetchSentMessages:', error);
     }
-  };
+};
+
 
   const fetchDirectMessages = async () => {
     console.log('Fetching received direct messages...');
