@@ -71,7 +71,7 @@ setMyDid(did);
       published: true,
       types: {
         secretMessage: {
-          schema: "https://example.com/health5schema",
+          schema: "https://example.com/secretMessageSchema",
           dataFormats: ["application/json"],
         },
         directMessage: {
