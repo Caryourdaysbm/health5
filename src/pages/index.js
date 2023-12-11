@@ -71,11 +71,11 @@ setMyDid(did);
       published: true,
       types: {
         secretMessage: {
-          schema: "https://example.com/secretMessageSchema",
+          schema: "https://schema.org/secretMessageSchema",
           dataFormats: ["application/json"],
         },
         directMessage: {
-          schema: "https://example.com/directMessageSchema",
+          schema: "https://schema.org/directMessageSchema",
           dataFormats: ["application/json"],
         },
       },
@@ -224,7 +224,7 @@ setMyDid(did);
             message: {
                 filter: {
                     protocol: "https://sbm.hashnode.dev/health5app",
-                    schema: "https://example.com/directMessageSchema",
+                    schema: "https://schema.org/directMessageSchema",
                 },
             },
         });
