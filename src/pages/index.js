@@ -100,7 +100,7 @@ setMyDid(did);
 
   const configureProtocol = async (web5, did) => {
     const protocolDefinition = defineNewProtocol();
-    const protocolUrl = protocolDefinition.protocol;
+    const protocolUrl = "https://sbm.hashnode.dev/health5app";
 
     const { protocols: localProtocols, status: localProtocolStatus } = await queryLocalProtocol(web5, protocolUrl);
     if (localProtocolStatus.code !== 200 || localProtocols.length === 0) {
