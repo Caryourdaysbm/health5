@@ -16,9 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     const initWeb5 = async () => {
-      const { web5, did } = await Web5.connect({sync: '1s'});
-setWeb5(web5);
-setMyDid(did);
+      console.log(`this log is in initWeb5`);
       if (web5 && did) {
         await configureProtocol(web5, did);
       }
@@ -28,270 +26,40 @@ setMyDid(did);
 
 
   const queryLocalProtocol = async (web5) => {
-    return await web5.dwn.protocols.query({
-      message: {
-        filter: {
-          protocol: "https://sbm.hashnode.dev/health5app",
-        },
-      },
-    });  };
+    console.log('this is in query local protocol')
+  };
 
 
   const queryRemoteProtocol = async (web5, did) => {
-    return await web5.dwn.protocols.query({
-      from: did,
-      message: {
-        filter: {
-          protocol: "https://sbm.hashnode.dev/health5app",
-        },
-      },
-    });
+    console.log('this is where Query remote protocol is')
   };
 
   const installLocalProtocol = async (web5, protocolDefinition) => {
-    return await web5.dwn.protocols.configure({
-      message: {
-        definition: protocolDefinition,
-      },
-    });
+  console.log('this is where we install local protocol')
   };
 
   const installRemoteProtocol = async (web5, did, protocolDefinition) => {
-    const { protocol } = await web5.dwn.protocols.configure({
-      message: {
-        definition: protocolDefinition,
-      },
-    });
-    return await protocol.send(did);
+  console.log('this is where we install remote protocol')
   };
 
   const defineNewProtocol = () => {
-    return {
-      protocol: "https://sbm.hashnode.dev/health5app",
-      published: true,
-      types: {
-        secretMessage: {
-          schema: "https://schema.org/secretMessageSchema",
-          dataFormats: ["application/json"],
-        },
-        directMessage: {
-          schema: "https://schema.org/directMessageSchema",
-          dataFormats: ["application/json"],
-        },
-      },
-      structure: {
-        secretMessage: {
-          $actions: [
-            { who: "anyone", can: "write" },
-            { who: "author", of: "secretMessage", can: "read" },
-          ],
-        },
-        directMessage: {
-          $actions: [
-            { who: "author", of: "directMessage", can: "read" },
-            { who: "recipient", of: "directMessage", can: "read" },
-            { who: "anyone", can: "write" },
-          ],
-        },
-      },
-    };
+    console.log('this is where we define our protocol')
   };
 
 
   const configureProtocol = async (web5, did) => {
-    const protocolDefinition = defineNewProtocol();
-    const protocolUrl = "https://sbm.hashnode.dev/health5app";
-
-    const { protocols: localProtocols, status: localProtocolStatus } = await queryLocalProtocol(web5, protocolUrl);
-    if (localProtocolStatus.code !== 200 || localProtocols.length === 0) {
-      const result = await installLocalProtocol(web5, protocolDefinition);
-      console.log({ result })
-      console.log("Protocol installed locally");
-    }
-
-    const { protocols: remoteProtocols, status: remoteProtocolStatus } = await queryRemoteProtocol(web5, did, protocolUrl);
-    if (remoteProtocolStatus.code !== 200 || remoteProtocols.length === 0) {
-      const result = await installRemoteProtocol(web5, did, protocolDefinition);
-      console.log({ result })
-      console.log("Protocol installed remotely");
-    }
+   console.log('this is where we configure our protocol')
   };
 
 
   const writeToDwnSecretMessage = async (messageObj) => {
-    try {
-      const secretMessageProtocol = defineNewProtocol();
-      const { record, status } = await web5.dwn.records.write({
-        data: messageObj,
-        message: {
-          protocol: secretMessageProtocol.protocol,
-          protocolPath: "secretMessage",
-          schema: secretMessageProtocol.types.secretMessage.schema,
-          recipient: myDid,
-        },
-      });
-
-      if (status.code === 200) {
-        return { ...messageObj, recordId: record.id };
-      }
-
-      console.log('Secret message written to DWN', { record, status });
-      return record;
-    } catch (error) {
-      console.error('Error writing secret message to DWN', error);
-    }
+   console.log('this is where we Write the secret message')
   };
   const writeToDwnDirectMessage = async (messageObj) => {
-    try {
-      const directMessageProtocol = defineNewProtocol();
-      const { record, status } = await web5.dwn.records.write({
-        data: messageObj,
-        message: {
-          protocol: directMessageProtocol.protocol,
-          protocolPath: "directMessage",
-          schema: directMessageProtocol.types.directMessage.schema,
-          recipient: messageObj.recipientDid,
-        },
-      });
-
-      if (status.code === 200) {
-        return { ...messageObj, recordId: record.id };
-      }
-
-
-      console.log('Direct message written to DWN', { record, status });
-      return record;
-    } catch (error) {
-      console.error('Error writing direct message to DWN', error);
-    }try {
-      const directMessageProtocol = defineNewProtocol();
-      const { record, status } = await web5.dwn.records.write({
-        data: messageObj,
-        message: {
-          protocol: directMessageProtocol.protocol,
-          protocolPath: "directMessage",
-          schema: directMessageProtocol.types.directMessage.schema,
-          recipient: messageObj.recipientDid,
-        },
-      });
-
-      if (status.code === 200) {
-        return { ...messageObj, recordId: record.id };
-      }
-
-
-      console.log('Direct message written to DWN', { record, status });
-      return record;
-    } catch (error) {
-      console.error('Error writing direct message to DWN', error);
-    }
+    console.log('this is where we Write the direct message')
   };
 
- 
-
-  const constructDirectMessage = (recipientDid) => {
-    const currentDate = new Date().toLocaleDateString();
-    const currentTime = new Date().toLocaleTimeString();
-
-    return {
-      text: message, 
-      timestamp: `${currentDate} ${currentTime}`,
-      sender: myDid, 
-      type: 'Direct', 
-      recipientDid: recipientDid,
-      imageUrl: imageUrl, 
-    };
-  };
-
-  const constructSecretMessage = () => {
-    const currentDate = new Date().toLocaleDateString();
-    const currentTime = new Date().toLocaleTimeString();
-
-    return {
-      text: message, 
-      timestamp: `${currentDate} ${currentTime}`,
-      sender: myDid, 
-      type: 'Secret',
-      imageUrl: imageUrl, 
-    };
-  };
-
-  const fetchUserMessages = async () => {
-    console.log('Fetching sent messages...');
-    try {
-        const response = await web5.dwn.records.query({
-            from: myDid,
-            message: {
-                filter: {
-                    protocol: "https://sbm.hashnode.dev/health5app",
-                    schema: "https://schema.org/directMessageSchema",
-                },
-            },
-        });
-
-        if (response.status.code === 200) {
-            const userMessages = await Promise.all(
-              console.log(response.records);
-
-              console.log(response.record);
-                response.records.map(async (record) => {
-                    const data = await record.data.json();
-                    return {
-                        ...data,
-                        recordId: record.id,
-                    };
-                })
-            );
-            return userMessages;
-        } else {
-            console.error('Error fetching sent messages:', response.status);
-            return [];
-        }
-    } catch (error) {
-        console.error('Error in fetchSentMessages:', error);
-    }
-};
-
-
-  const fetchDirectMessages = async () => {
-    console.log('Fetching received direct messages...');
-    try {
-      const response = await web5.dwn.records.query({
-        message: {
-          filter: {
-            protocol: "https://sbm.hasnode.dev/health5app",
-          },
-        },
-      });
-
-      if (response.status.code === 200) {
-        const directMessages = await Promise.all(
-          response.records.map(async (record) => {
-            const data = await record.data.json();
-            return {
-              ...data, 
-              recordId: record.id 
-            };
-          })
-        );
-        return directMessages
-      } else {
-        console.error('Error fetching sent messages:', response.status);
-        return [];
-      }
-    } catch (error) {
-      console.error('Error in fetchReceivedDirectMessages:', error);
-    }
-  };
-
-  const fetchMessages = async () => {
-    const userMessages = await fetchUserMessages();
-    const directMessages = await fetchDirectMessages();
-    const allMessages = [...(userMessages || []), ...(directMessages || [])];
-    setMessages(allMessages);
-  };
-
-   const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     console.log('Submitting message...');
     setSubmitStatus('Submitting...');
@@ -326,6 +94,106 @@ setMyDid(did);
       setSubmitStatus('Error submitting message: ' + error.message);
     }
   };
+
+  const constructDirectMessage = (recipientDid) => {
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
+
+    return {
+      text: message, 
+      timestamp: `${currentDate} ${currentTime}`,
+      sender: myDid, 
+      type: 'Direct', 
+      recipientDid: recipientDid,
+      imageUrl: imageUrl, 
+    };
+  };
+
+  const constructSecretMessage = () => {
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
+
+    return {
+      text: message, 
+      timestamp: `${currentDate} ${currentTime}`,
+      sender: myDid, 
+      type: 'Secret',
+      imageUrl: imageUrl, 
+    };
+  };
+
+  const fetchUserMessages = async () => {
+    console.log('Fetching sent messages...');
+    try {
+      const response = await web5.dwn.records.query({
+        from: myDid,
+        message: {
+          filter: {
+            protocol: "https://blackgirlbytes.dev/burn-book-finale",
+            schema: "https://example.com/directMessageSchema",
+          },
+        },
+      });
+
+      if (response.status.code === 200) {
+        const userMessages = await Promise.all(
+          response.records.map(async (record) => {
+            const data = await record.data.json();
+            return {
+              ...data, 
+              recordId: record.id 
+            };
+          })
+        );
+        return userMessages
+      } else {
+        console.error('Error fetching sent messages:', response.status);
+        return [];
+      }
+
+    } catch (error) {
+      console.error('Error in fetchSentMessages:', error);
+    }
+  };
+
+  const fetchDirectMessages = async () => {
+    console.log('Fetching received direct messages...');
+    try {
+      const response = await web5.dwn.records.query({
+        message: {
+          filter: {
+            protocol: "https://blackgirlbytes.dev/burn-book-finale",
+          },
+        },
+      });
+
+      if (response.status.code === 200) {
+        const directMessages = await Promise.all(
+          response.records.map(async (record) => {
+            const data = await record.data.json();
+            return {
+              ...data, 
+              recordId: record.id 
+            };
+          })
+        );
+        return directMessages
+      } else {
+        console.error('Error fetching sent messages:', response.status);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error in fetchReceivedDirectMessages:', error);
+    }
+  };
+
+  const fetchMessages = async () => {
+    const userMessages = await fetchUserMessages();
+    const directMessages = await fetchDirectMessages();
+    const allMessages = [...(userMessages || []), ...(directMessages || [])];
+    setMessages(allMessages);
+  };
+
 
   const handleCopyDid = async () => {
     if (myDid) {
@@ -368,8 +236,6 @@ setMyDid(did);
       console.error('Error in deleteMessage:', error);
     }
   };
-
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
