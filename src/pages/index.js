@@ -31,7 +31,7 @@ setMyDid(did);
     return await web5.dwn.protocols.query({
       message: {
         filter: {
-          protocol: "https://blackgirlbytes.dev/burn-book-finale",
+          protocol: "https://sbm.hashnode.dev/health5",
         },
       },
     });
@@ -43,7 +43,7 @@ setMyDid(did);
       from: did,
       message: {
         filter: {
-          protocol: "https://blackgirlbytes.dev/burn-book-finale",
+          protocol: "https://sbm.hashnode.dev/health5",
         },
       },
     });
@@ -68,7 +68,7 @@ setMyDid(did);
 
   const defineNewProtocol = () => {
     return {
-      protocol: "https://blackgirlbytes.dev/burn-book-finale",
+      protocol: "https://sbm.hashnode.dev/health5",
       published: true,
       types: {
         secretMessage: {
@@ -291,7 +291,7 @@ setMyDid(did);
       const response = await web5.dwn.records.query({
         message: {
           filter: {
-            protocol: "https://blackgirlbytes.dev/burn-book-finale",
+            protocol: "https://sbm.hashnode.dev/health5",
           },
         },
       });
