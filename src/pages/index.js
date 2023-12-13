@@ -264,22 +264,21 @@ setMyDid(did);
         },
       });
 
-      if (response.status.code === 200) {
-        const userMessages = await Promise.all(
-          response.records.map(async (record) => {
-            const data = await record.data.json();
-            return {
-              ...data, 
-              recordId: record.id 
-            };
-          })
-        );
-        return userMessages
-      } else {
-        console.error('Error fetching sent messages:', response.status);
-        return [];
-      }
-
+        if (response.status.code === 200) {
+            const userMessages = await Promise.all(
+                response.records.map(async (record) => {
+                    const data = await record.data.json();
+                    return {
+                        ...data,
+                        recordId: record.id,
+                    };
+                })
+            );
+            return userMessages;
+        } else {
+            console.error('Error fetching sent messages:', response.status);
+            return [];
+        }
     } catch (error) {
       console.error('Error in fetchSentMessages:', error);
     }
