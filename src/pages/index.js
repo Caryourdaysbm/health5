@@ -16,7 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     const initWeb5 = async () => {
-      const { web5, did } = await Web5.connect({sync: '1s'});
+      const { web5, did } = await Web5.connect({sync: '5s'});
 setWeb5(web5);
 setMyDid(did);
       if (web5 && did) {
@@ -31,10 +31,11 @@ setMyDid(did);
     return await web5.dwn.protocols.query({
       message: {
         filter: {
-          protocol: "https://sbm.hashnode.dev/health5app",
+          protocol: "https://blackgirlbytes.dev/burn-book-finale",
         },
       },
-    });  };
+    });
+  };
 
 
   const queryRemoteProtocol = async (web5, did) => {
@@ -42,7 +43,7 @@ setMyDid(did);
       from: did,
       message: {
         filter: {
-          protocol: "https://sbm.hashnode.dev/health5app",
+          protocol: "https://blackgirlbytes.dev/burn-book-finale",
         },
       },
     });
@@ -67,15 +68,15 @@ setMyDid(did);
 
   const defineNewProtocol = () => {
     return {
-      protocol: "https://sbm.hashnode.dev/health5app",
+      protocol: "https://blackgirlbytes.dev/burn-book-finale",
       published: true,
       types: {
         secretMessage: {
-          schema: "https://schema.org/secretMessageSchema",
+          schema: "https://example.com/secretMessageSchema",
           dataFormats: ["application/json"],
         },
         directMessage: {
-          schema: "https://schema.org/directMessageSchema",
+          schema: "https://example.com/directMessageSchema",
           dataFormats: ["application/json"],
         },
       },
@@ -100,7 +101,7 @@ setMyDid(did);
 
   const configureProtocol = async (web5, did) => {
     const protocolDefinition = defineNewProtocol();
-    const protocolUrl = "https://sbm.hashnode.dev/health5app";
+    const protocolUrl = protocolDefinition.protocol;
 
     const { protocols: localProtocols, status: localProtocolStatus } = await queryLocalProtocol(web5, protocolUrl);
     if (localProtocolStatus.code !== 200 || localProtocols.length === 0) {
@@ -187,108 +188,7 @@ setMyDid(did);
     }
   };
 
- 
-
-  const constructDirectMessage = (recipientDid) => {
-    const currentDate = new Date().toLocaleDateString();
-    const currentTime = new Date().toLocaleTimeString();
-
-    return {
-      text: message, 
-      timestamp: `${currentDate} ${currentTime}`,
-      sender: myDid, 
-      type: 'Direct', 
-      recipientDid: recipientDid,
-      imageUrl: imageUrl, 
-    };
-  };
-
-  const constructSecretMessage = () => {
-    const currentDate = new Date().toLocaleDateString();
-    const currentTime = new Date().toLocaleTimeString();
-
-    return {
-      text: message, 
-      timestamp: `${currentDate} ${currentTime}`,
-      sender: myDid, 
-      type: 'Secret',
-      imageUrl: imageUrl, 
-    };
-  };
-
-  const fetchUserMessages = async () => {
-    console.log('Fetching sent messages...');
-    try {
-        const response = await web5.dwn.records.query({
-            from: myDid,
-            message: {
-                filter: {
-                    protocol: "https://sbm.hashnode.dev/health5app",
-                    schema: "https://schema.org/directMessageSchema",
-                },
-            },
-        });
-
-        if (response.status.code === 200) {
-            const userMessages = await Promise.all(
-                response.records.map(async (record) => {
-                    const data = await record.data.json();
-                    return {
-                        ...data,
-                        recordId: record.id,
-                    };
-                })
-            );
-            return userMessages;
-        } else {
-            console.error('Error fetching sent messages:', response.status);
-            return [];
-        }
-    } catch (error) {
-        console.error('Error in fetchSentMessages:', error);
-    }
-};
-
-
-  const fetchDirectMessages = async () => {
-    console.log('Fetching received direct messages...');
-    try {
-      const response = await web5.dwn.records.query({
-        message: {
-          filter: {
-            protocol: "https://sbm.hasnode.dev/health5app",
-          },
-        },
-      });
-
-      if (response.status.code === 200) {
-        const directMessages = await Promise.all(
-          response.records.map(async (record) => {
-            const data = await record.data.json();
-            return {
-              ...data, 
-              recordId: record.id 
-            };
-          })
-        );
-        return directMessages
-      } else {
-        console.error('Error fetching sent messages:', response.status);
-        return [];
-      }
-    } catch (error) {
-      console.error('Error in fetchReceivedDirectMessages:', error);
-    }
-  };
-
-  const fetchMessages = async () => {
-    const userMessages = await fetchUserMessages();
-    const directMessages = await fetchDirectMessages();
-    const allMessages = [...(userMessages || []), ...(directMessages || [])];
-    setMessages(allMessages);
-  };
-
-   const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     console.log('Submitting message...');
     setSubmitStatus('Submitting...');
@@ -323,6 +223,107 @@ setMyDid(did);
       setSubmitStatus('Error submitting message: ' + error.message);
     }
   };
+
+  const constructDirectMessage = (recipientDid) => {
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
+
+    return {
+      text: message, 
+      timestamp: `${currentDate} ${currentTime}`,
+      sender: myDid, 
+      type: 'Direct', 
+      recipientDid: recipientDid,
+      imageUrl: imageUrl, 
+    };
+  };
+
+  const constructSecretMessage = () => {
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
+
+    return {
+      text: message, 
+      timestamp: `${currentDate} ${currentTime}`,
+      sender: myDid, 
+      type: 'Secret',
+      imageUrl: imageUrl, 
+    };
+  };
+
+  const fetchUserMessages = async () => {
+    console.log('Fetching sent messages...');
+    try {
+
+        const response = await web5.dwn.records.query({
+            from: myDid,
+            message: {
+                filter: {
+                    protocol: "https://sbm.hashnode.dev/health5app",
+                    schema: "https://schema.org/directMessageSchema",
+                },
+            },
+        });
+
+        if (response.status.code === 200) {
+            const userMessages = await Promise.all(
+                response.records.map(async (record) => {
+                    const data = await record.data.json();
+                    return {
+                        ...data,
+                        recordId: record.id,
+                    };
+                })
+            );
+            return userMessages;
+        } else {
+            console.error('Error fetching sent messages:', response.status);
+            return [];
+        }
+
+    } catch (error) {
+      console.error('Error in fetchSentMessages:', error);
+    }
+  };
+
+  const fetchDirectMessages = async () => {
+    console.log('Fetching received direct messages...');
+    try {
+      const response = await web5.dwn.records.query({
+        message: {
+          filter: {
+            protocol: "https://blackgirlbytes.dev/burn-book-finale",
+          },
+        },
+      });
+
+      if (response.status.code === 200) {
+        const directMessages = await Promise.all(
+          response.records.map(async (record) => {
+            const data = await record.data.json();
+            return {
+              ...data, 
+              recordId: record.id 
+            };
+          })
+        );
+        return directMessages
+      } else {
+        console.error('Error fetching sent messages:', response.status);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error in fetchReceivedDirectMessages:', error);
+    }
+  };
+
+  const fetchMessages = async () => {
+    const userMessages = await fetchUserMessages();
+    const directMessages = await fetchDirectMessages();
+    const allMessages = [...(userMessages || []), ...(directMessages || [])];
+    setMessages(allMessages);
+  };
+
 
   const handleCopyDid = async () => {
     if (myDid) {
@@ -365,8 +366,6 @@ setMyDid(did);
       console.error('Error in deleteMessage:', error);
     }
   };
-
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
