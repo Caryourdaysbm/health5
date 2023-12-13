@@ -254,15 +254,16 @@ setMyDid(did);
   const fetchUserMessages = async () => {
     console.log('Fetching sent messages...');
     try {
-      const response = await web5.dwn.records.query({
-        from: myDid,
-        message: {
-          filter: {
-            protocol: "https://blackgirlbytes.dev/burn-book-finale",
-            schema: "https://example.com/directMessageSchema",
-          },
-        },
-      });
+
+        const response = await web5.dwn.records.query({
+            from: myDid,
+            message: {
+                filter: {
+                    protocol: "https://sbm.hashnode.dev/health5app",
+                    schema: "https://schema.org/directMessageSchema",
+                },
+            },
+        });
 
         if (response.status.code === 200) {
             const userMessages = await Promise.all(
