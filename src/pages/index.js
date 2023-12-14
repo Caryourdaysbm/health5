@@ -413,7 +413,7 @@ setMyDid(did);
         {didCopied && <p className={styles.alertText}>DID copied to clipboard!</p>}
       </div>
       {messages.map((message, index) => (
-        <div key={index} className={styles.container}>
+        <div key={index} className={styles.formContainer}>
           <div className={styles.field}>
             <div className={styles.fieldName}>From:</div>
             <div className={styles.didContainer}>{message.sender}</div>
