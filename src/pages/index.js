@@ -7,6 +7,7 @@ export default function Home() {
   const [myDid, setMyDid] = useState(null);
   const [recipientDid, setRecipientDid] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [image, setImage] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [messageType, setMessageType] = useState('Secret');
@@ -26,7 +27,16 @@ setMyDid(did);
     initWeb5();
   }, []);
 
-
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]; 
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const queryLocalProtocol = async (web5) => {
     return await web5.dwn.protocols.query({
       message: {
@@ -235,6 +245,7 @@ setMyDid(did);
       type: 'Direct', 
       recipientDid: recipientDid,
       imageUrl: imageUrl, 
+      image: image,
     };
   };
 
@@ -248,6 +259,7 @@ setMyDid(did);
       sender: myDid, 
       type: 'Secret',
       imageUrl: imageUrl, 
+      image: image,
     };
   };
 
@@ -386,6 +398,15 @@ setMyDid(did);
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
           />
+            <input
+            className={styles.input}
+            type="file"
+            placeholder="Upload a file or image(optional)"
+           
+            id="file" name="file"
+            onChange={(e) => handleFileChange(e)}
+            multiple
+          />
           <select
             className={styles.select}
             value={messageType}
@@ -442,6 +463,15 @@ setMyDid(did);
                 className={styles.image}
                 src={message.imageUrl}
                 alt="Uploaded content"
+              />
+            </div>
+          )}
+          {message.image && (
+            <div className={styles.imageContainer}>
+              <img
+                className={styles.image}
+                src={message.image}
+                alt="Uploaded file content"
               />
             </div>
           )}
