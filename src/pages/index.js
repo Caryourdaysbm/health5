@@ -37,6 +37,28 @@ setMyDid(did);
       reader.readAsDataURL(file);
     }
   };
+  const downloadImage = (url, filename) => {
+    let contentType;
+  
+    fetch(url)
+      .then(response => {
+        contentType = response.headers.get('content-type') || 'application/octet-stream';
+        return response.blob();
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(new Blob([blob], { type: contentType }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      })
+      .catch(error => console.error('Error downloading image:', error));
+  };
+  
+
+  
   const queryLocalProtocol = async (web5) => {
     return await web5.dwn.protocols.query({
       message: {
@@ -473,6 +495,12 @@ setMyDid(did);
                 src={message.image}
                 alt="Uploaded file content"
               />
+              <button
+          className={styles.downloadButton}
+          onClick={() => downloadImage(message.image, `file_${index}`)}
+        >
+          Download File
+        </button>
             </div>
           )}
           <div className={`${styles.messageType} ${styles[message.type.toLowerCase()]}`}>
