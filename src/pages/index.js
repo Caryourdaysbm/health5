@@ -38,14 +38,10 @@ setMyDid(did);
     }
   };
   const downloadImage = (url, filename) => {
-    let contentType;
-  
     fetch(url)
-      .then(response => {
-        contentType = response.headers.get('content-type') || 'application/octet-stream';
-        return response.blob();
-      })
+      .then(response => response.blob())
       .then(blob => {
+        const contentType = response.headers.get('content-type') || 'application/octet-stream';
         const url = window.URL.createObjectURL(new Blob([blob], { type: contentType }));
         const a = document.createElement('a');
         a.href = url;
@@ -56,8 +52,6 @@ setMyDid(did);
       })
       .catch(error => console.error('Error downloading image:', error));
   };
-  
-
   
   const queryLocalProtocol = async (web5) => {
     return await web5.dwn.protocols.query({
@@ -375,6 +369,7 @@ setMyDid(did);
   const deleteMessage = async (recordId) => {
     try {
       const response = await web5.dwn.records.query({
+        from: myDid,
         message: {
           filter: {
             recordId: recordId,
@@ -388,7 +383,9 @@ setMyDid(did);
 
         if (deleteResult.status.code === 202) {
           console.log('Message deleted successfully');
-          setMessages(prevMessages => prevMessages.filter(message => message.recordId !== recordId));
+          setMessages((prevMessages) =>
+            prevMessages.filter((message) => message.recordId !== recordId)
+          );
         } else {
           console.error('Error deleting message:', deleteResult.status);
         }
