@@ -99,6 +99,34 @@
   font-size: 15px;
   line-height: 1.5;
   color: #333;
+  width: 100%; /* Adjust the width as needed */
+  margin-bottom: 20px;
+}
+.messageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100px; /* Adjust the maximum width as needed */
+  margin: 0 auto; /* Center the container on the page */
+}
+
+/* Add media query for smaller screens if necessary */
+@media (max-width: 600px) {
+  .messageContainer {
+    max-width: 100%;
+  }
+}
+
+.textarea {
+  width: 100%; /* Adjust the width as needed */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Add media query for smaller screens if necessary */
+@media (max-width: 600px) {
+  .textarea {
+    width: 100%;
+  }
 }
 
 .messageType {
