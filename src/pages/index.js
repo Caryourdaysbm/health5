@@ -13,6 +13,8 @@ export default function Home() {
   const [messageType, setMessageType] = useState('Secret');
   const [submitStatus, setSubmitStatus] = useState('');
   const [didCopied, setDidCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
 
 
   useEffect(() => {
@@ -147,6 +149,7 @@ setMyDid(did);
 
   const writeToDwnSecretMessage = async (messageObj) => {
     try {
+      setLoading(true);
       const secretMessageProtocol = defineNewProtocol();
       const { record, status } = await web5.dwn.records.write({
         data: messageObj,
@@ -159,17 +162,20 @@ setMyDid(did);
       });
 
       if (status.code === 200) {
+        // setLoading(false);
         return { ...messageObj, recordId: record.id };
-      }
+              }
 
       console.log('Secret message written to DWN', { record, status });
       return record;
     } catch (error) {
       console.error('Error writing secret message to DWN', error);
+      setLoading(false);
     }
   };
   const writeToDwnDirectMessage = async (messageObj) => {
     try {
+      setLoading(true);
       const directMessageProtocol = defineNewProtocol();
       const { record, status } = await web5.dwn.records.write({
         data: messageObj,
@@ -217,6 +223,7 @@ setMyDid(did);
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log('Submitting message...');
+    
     setSubmitStatus('Submitting...');
 
     try {
@@ -226,19 +233,26 @@ setMyDid(did);
 
       if (messageType === 'Direct') {
         console.log('Sending direct message...');
+        
         messageObj = constructDirectMessage(recipientDid); 
         record = await writeToDwnDirectMessage(messageObj); 
+        setLoading(false);
       } else {
+        
         messageObj = constructSecretMessage(); 
         record = await writeToDwnSecretMessage(messageObj);
+        setLoading(false);
       }
 
       if (record) {
         const { status } = await record.send(targetDid);
         console.log("Send record status in handleSubmit", status);
+        setLoading(false);
         setSubmitStatus('Message submitted successfully');
         await fetchMessages();
+        setLoading(false);
       } else {
+        setLoading2(false);
         throw new Error('Failed to create record');
       }
 
@@ -281,6 +295,7 @@ setMyDid(did);
 
   const fetchUserMessages = async () => {
     console.log('Fetching sent messages...');
+    setLoading2(true);
     try {
 
         const response = await web5.dwn.records.query({
@@ -294,6 +309,7 @@ setMyDid(did);
         });
 
         if (response.status.code === 200) {
+          setLoading2(false);
             const userMessages = await Promise.all(
                 response.records.map(async (record) => {
                     const data = await record.data.json();
@@ -305,6 +321,7 @@ setMyDid(did);
             );
             return userMessages;
         } else {
+          setLoading2(false);
             console.error('Error fetching sent messages:', response.status);
             return [];
         }
@@ -315,6 +332,7 @@ setMyDid(did);
 
   const fetchDirectMessages = async () => {
     console.log('Fetching received direct messages...');
+    setLoading2(true);
     try {
       const response = await web5.dwn.records.query({
         message: {
@@ -325,6 +343,7 @@ setMyDid(did);
       });
 
       if (response.status.code === 200) {
+        setLoading2(false);
         const directMessages = await Promise.all(
           response.records.map(async (record) => {
             const data = await record.data.json();
@@ -336,6 +355,7 @@ setMyDid(did);
         );
         return directMessages
       } else {
+        setLoading2(false);
         console.error('Error fetching sent messages:', response.status);
         return [];
       }
@@ -445,9 +465,9 @@ setMyDid(did);
             />
           )}
           <div className={styles.buttonContainer}>
-            <button className={styles.button} type="submit">Submit Info/diagnosis</button>
-            <button className={styles.secondaryButton} type="button" onClick={fetchMessages}>Refresh Info</button>
-            <button className={styles.secondaryButton} type="button" onClick={handleCopyDid}>Copy DID</button>
+            <button className={styles.button} type="submit">{loading ? "Processing..." : "Submit Info/diagnosis"}</button>
+            <button className={styles.secondaryButton} type="button" onClick={fetchMessages}>{loading2 ? "Processing..." : "Refresh info"}</button>
+            <button className={styles.secondaryButton} type="button" onClick={handleCopyDid}>{loading ? "Processing..." : "Copy DID"}</button>
           </div>
         </form>
         {didCopied && <p className={styles.alertText}>DID copied to clipboard!</p>}
